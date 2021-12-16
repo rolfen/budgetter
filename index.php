@@ -30,6 +30,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 // ********** Summary ***********
 
+
+
 $q = "
  SELECT 
  	DATEDIFF(NOW(), budget.start_date) + 1 as days, 
@@ -52,6 +54,20 @@ $row = mysqli_fetch_assoc(mysqli_query($conn, $q));
 <head>
 	<meta charset="utf-8">
 	<title></title>
+	<style>
+			table.daily td {
+				padding: 5px;
+				border: 1px solid rgba(0,0,0,.3);
+			}
+			table.daily td textarea,
+			table.daily td input {
+				box-sizing: 	border-box;
+				border: 0;
+				padding: 0;
+				min-width: 100%;
+				min-height: 	3em;
+			}
+	</style>
 </head>
 <body>
 
@@ -67,14 +83,14 @@ $row = mysqli_fetch_assoc(mysqli_query($conn, $q));
 
 
 	<form method="post" action="<?php echo $_SERVER['PHP_SELF'];?>">
-		<table>
+		<table class="daily">
 			<?php foreach (mysqli_query($conn, $q_daily)->fetch_all(MYSQLI_ASSOC) as $key => $expense): ?>
 			<tr>
 				<td>
 					<?=	$expense['amt'] ?>
 				</td>
 				<td>
-					<?=	$expense['note'] ?>
+					<pre><?=	$expense['note'] ?></pre>
 				</td>
 				<td>
 					<input type="button" value="Change">
@@ -83,10 +99,10 @@ $row = mysqli_fetch_assoc(mysqli_query($conn, $q));
 			<?php endforeach ?>
 			<tr>
 				<td>
-					<input type="number" name="amt" placeholder="amount" min="0">
+					<input type="number" step=.1 name="amt" placeholder="amount" min="0">
 				</td>
 				<td>
-					<input type="text" name="note" placeholder="note">
+					<textarea name="note" placeholder="note"></textarea>
 				</td>
 				<td>
 					<input type="submit" value="Add">
