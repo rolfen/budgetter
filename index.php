@@ -2,7 +2,17 @@
 
 // Create connection
 
-$err = "";
+$err = $dbg = [];
+
+function log_err($error) {
+	global $err;
+	array_push($err, $error);
+}
+
+function debug($info) {
+	global $dbg;
+	array_push($dbg, $info);	
+}
 
 $servername = "localhost";
 $username = "budgetter";
@@ -27,12 +37,18 @@ $seldate = (  @$_GET['date'] ? (int)$_GET['date'] : $curdate );
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   // collect value of input field
   if (empty($_POST['amt'])) {
-    $err = "Oops: No amount";
+    log_err([
+    	'line' => __LINE__,
+    	'message' => "Amount is missing"
+    ]);
   } else {
-	$sql = "INSERT INTO expense (amt, note, budget_id) VALUES (?,?,?)";
-	$stmt= $conn->prepare($sql);
-	$stmt->bind_param("dsi", $_POST['amt'], $_POST['note'], $budget_id);
-	$stmt->execute();
+		$sql = "INSERT INTO expense (amt, note, budget_id, `date`) VALUES (?,?,?,DATE(?))";
+		$stmt= $conn->prepare($sql);
+		$stmt->bind_param("dsis", $_POST['amt'], $_POST['note'], $budget_id, $seldate);
+		$stmt->execute() or log_err([
+			'line' => __LINE__,
+			'message' => $stmt->error
+		]);
   }
 }
 
@@ -51,7 +67,9 @@ from budget JOIN expense on expense.budget_id = budget.id
 WHERE budget.id = $budget_id;
 ";
 
-$q_daily = 	"SELECT amt, note  FROM expense WHERE DATE(expense.date) = $seldate AND budget_id = $budget_id";
+$q_daily = 	"SELECT amt, note  FROM expense WHERE DATE(expense.date) = '$seldate' AND budget_id = $budget_id";
+
+debug($q_daily);
 
 $row = mysqli_fetch_assoc(mysqli_query($conn, $q));
 
@@ -63,6 +81,10 @@ $row = mysqli_fetch_assoc(mysqli_query($conn, $q));
 <head>
 	<meta charset="utf-8">
 	<title></title>
+	<script type="text/javascript">
+		console.dir(<?= json_encode($err) ?>);
+		console.dir(<?= json_encode($dbg) ?>);
+	</script>
 	<style>
 			table.daily td {
 				padding: 5px;
