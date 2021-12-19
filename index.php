@@ -13,6 +13,15 @@ $conn = mysqli_connect($servername, $username, $password, $dbname);
 $budget_id = 1;
 
 
+// ************* Selected date **************
+
+$curdate = mysqli_fetch_assoc(mysqli_query(
+	$conn, 
+	"SELECT CURDATE() as curdate"
+))['curdate'];
+
+$seldate = (  @$_GET['date'] ? (int)$_GET['date'] : $curdate );
+
 // ************* Register new expense *************
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -37,12 +46,12 @@ $q = "
  	DATEDIFF(NOW(), budget.start_date) + 1 as days, 
 	budget.daily as daily_budget,
 	SUM(expense.amt) as expenses,
-	(SELECT SUM(amt) as sum FROM expense WHERE (DATE(date) = CURDATE())) as todays_expenses
+	(SELECT SUM(amt) as sum FROM expense WHERE (DATE(date) = $seldate)) as todays_expenses
 from budget JOIN expense on expense.budget_id = budget.id 
 WHERE budget.id = $budget_id;
 ";
 
-$q_daily = 	"SELECT amt, note FROM expense WHERE DATE(expense.date) = CURDATE() AND budget_id = $budget_id";
+$q_daily = 	"SELECT amt, note  FROM expense WHERE DATE(expense.date) = $seldate AND budget_id = $budget_id";
 
 $row = mysqli_fetch_assoc(mysqli_query($conn, $q));
 
@@ -78,7 +87,7 @@ $row = mysqli_fetch_assoc(mysqli_query($conn, $q));
 	<p>Cumulative expenses: <?= $row['expenses'] ?></p>
 	<p>Balance: <?= ($row['days'] * $row['daily_budget']) - $row['expenses'] ?></p>
 
-	<h2>Today</h2>
+	<h2><?= ($seldate == $curdate) ? "Today's expenses" : "Expense on ".$seldate ?></h2>
 
 
 
