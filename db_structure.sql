@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `expense` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `amt` float unsigned NOT NULL DEFAULT '0',
   `budget_id` int(10) unsigned NOT NULL,
-  `date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `date` date NULL DEFAULT NULL,
   `note` text,
   PRIMARY KEY (`id`),
   KEY `FK_expense_budget` (`budget_id`),
