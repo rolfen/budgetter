@@ -30,7 +30,7 @@ $curdate = mysqli_fetch_assoc(mysqli_query(
 	"SELECT CURDATE() as curdate"
 ))['curdate'];
 
-$seldate = (  @$_GET['date'] ? (int)$_GET['date'] : $curdate );
+$seldate = (  @$_GET['date'] ? $_GET['date'] : $curdate );
 
 // ************* Register new expense *************
 
@@ -95,7 +95,6 @@ $row = mysqli_fetch_assoc(mysqli_query($conn, $q));
 				box-sizing: 	border-box;
 				border: 0;
 				padding: 0;
-				min-width: 100%;
 				min-height: 	3em;
 			}
 	</style>
@@ -113,7 +112,7 @@ $row = mysqli_fetch_assoc(mysqli_query($conn, $q));
 
 
 
-	<form method="post" action="<?php echo $_SERVER['PHP_SELF'];?>">
+	<form method="post" action="<?php echo $_SERVER['PHP_SELF']."?date=$seldate";?>">
 		<table class="daily">
 			<?php foreach (mysqli_query($conn, $q_daily)->fetch_all(MYSQLI_ASSOC) as $key => $expense): ?>
 			<tr>
