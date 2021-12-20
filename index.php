@@ -32,6 +32,8 @@ $curdate = mysqli_fetch_assoc(mysqli_query(
 
 $seldate = (  @$_GET['date'] ? $_GET['date'] : $curdate );
 
+$cururl = $_SERVER['PHP_SELF']."?date=$seldate";
+
 // ************* Register new expense *************
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -108,11 +110,14 @@ $row = mysqli_fetch_assoc(mysqli_query($conn, $q));
 	<p>Cumulative expenses: <?= $row['expenses'] ?></p>
 	<p>Balance: <?= ($row['days'] * $row['daily_budget']) - $row['expenses'] ?></p>
 
-	<h2><?= ($seldate == $curdate) ? "Today's expenses" : "Expense on ".$seldate ?></h2>
+	<h2><?= ($seldate == $curdate) 
+		? "<a href=\"$cururl\">Today</a>'s expenses" 
+		: "Expenses on ".$seldate 
+	?></h2>
 
 
 
-	<form method="post" action="<?php echo $_SERVER['PHP_SELF']."?date=$seldate";?>">
+	<form method="post" action="<?php echo $cururl ;?>">
 		<table class="daily">
 			<?php foreach (mysqli_query($conn, $q_daily)->fetch_all(MYSQLI_ASSOC) as $key => $expense): ?>
 			<tr>
