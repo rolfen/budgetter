@@ -22,7 +22,6 @@ $conn = mysqli_connect($servername, $username, $password, $dbname);
 
 $budget_id = 1;
 
-
 // ************* Selected date **************
 
 $curdate = mysqli_fetch_assoc(mysqli_query(
@@ -110,10 +109,17 @@ $row = mysqli_fetch_assoc(mysqli_query($conn, $q));
 	<p>Cumulative expenses: <?= $row['expenses'] ?></p>
 	<p>Balance: <?= ($row['days'] * $row['daily_budget']) - $row['expenses'] ?></p>
 
-	<h2><?= ($seldate == $curdate) 
-		? "<a href=\"$cururl\">Today</a>'s expenses" 
-		: "Expenses on ".$seldate 
-	?></h2>
+	<?php
+	if ($seldate == $curdate) {
+		echo "<h2>Today's expenses</h2>";
+	} else {
+		echo  "<a href=\"".$_SERVER['PHP_SELF']."?date=$curdate"."\">Goto today</a>";
+		echo "<h2>Expenses on $seldate</h2>";
+	}
+	?>
+	
+
+	
 
 
 
@@ -134,7 +140,7 @@ $row = mysqli_fetch_assoc(mysqli_query($conn, $q));
 			<?php endforeach ?>
 			<tr>
 				<td>
-					<input type="number" step=.1 name="amt" placeholder="amount" min="0">
+					<input type="number" step=.1 name="amt" placeholder="amount" >
 				</td>
 				<td>
 					<textarea name="note" placeholder="note"></textarea>

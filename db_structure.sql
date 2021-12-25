@@ -17,21 +17,26 @@ CREATE TABLE IF NOT EXISTS `budget` (
   `daily` float unsigned NOT NULL DEFAULT '0',
   `start_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
 
 -- Dumping structure for table budgeteer.expense
-CREATE TABLE IF NOT EXISTS `expense` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `amt` float unsigned NOT NULL DEFAULT '0',
-  `budget_id` int(10) unsigned NOT NULL,
-  `date` date NULL DEFAULT NULL,
-  `note` text,
-  PRIMARY KEY (`id`),
-  KEY `FK_expense_budget` (`budget_id`),
-  CONSTRAINT `FK_expense_budget` FOREIGN KEY (`budget_id`) REFERENCES `budget` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+CREATE TABLE `expense` (
+	`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`amt` FLOAT NOT NULL DEFAULT '0',
+	`budget_id` INT(10) UNSIGNED NOT NULL,
+	`date` DATE NULL DEFAULT NULL,
+	`note` TEXT NULL,
+	PRIMARY KEY (`id`),
+	INDEX `FK_expense_budget` (`budget_id`),
+	CONSTRAINT `FK_expense_budget` FOREIGN KEY (`budget_id`) REFERENCES `budget` (`id`) ON UPDATE CASCADE ON DELETE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+ENGINE=InnoDB
+AUTO_INCREMENT=1
+;
+
 
 -- Data exporting was unselected.
 
