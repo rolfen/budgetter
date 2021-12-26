@@ -40,8 +40,15 @@ $cururl = $_SERVER['PHP_SELF']."?date=$seldate";
 
 // ************* cruD **************
 
-@$_GET['delete'] and 
-( mysqli_query($conn, $q = sprintf("DELETE FROM `%s` WHERE `id` = ", DB_EXPENSES_TABLE).(int)$_GET['delete'] ) or debug($q) and log_err(mysql_error()) ) ;
+
+@$_GET['delete'] 
+and !mysqli_query($conn, $q = sprintf(
+	"DELETE FROM `%s` WHERE `id` = %d",
+	 DB_EXPENSES_TABLE, $_GET['delete'] 
+)) 
+and debug($q) 
+and log_err(mysqli_error($conn)) 
+;
 
 
 // ************* Register new expense *************
