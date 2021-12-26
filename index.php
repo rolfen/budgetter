@@ -2,23 +2,28 @@
 
 // Create connection
 
+define('SERVERNAME', "localhost");
+define('USERNAME', "budgetter");
+define('PASSWORD', "budgetter");
+define('DBNAME', "budgeteer");
+define('DB_EXPENSES_TABLE', "expense");
+
+
 $err = $dbg = [];
 
 function log_err($error) {
 	global $err;
 	array_push($err, $error);
+	return true;
 }
 
 function debug($info) {
 	global $dbg;
-	array_push($dbg, $info);	
+	array_push($dbg, $info);
+	return true;
 }
 
-$servername = "localhost";
-$username = "budgetter";
-$password = "budgetter";
-$dbname = "budgeteer";
-$conn = mysqli_connect($servername, $username, $password, $dbname);
+$conn = mysqli_connect(SERVERNAME, USERNAME, PASSWORD, DBNAME);
 
 $budget_id = 1;
 
@@ -33,6 +38,12 @@ $seldate = (  @$_GET['date'] ? $_GET['date'] : $curdate );
 
 $cururl = $_SERVER['PHP_SELF']."?date=$seldate";
 
+// ************* cruD **************
+
+@$_GET['delete'] and 
+( mysqli_query($conn, $q = sprintf("DELETE FROM `%s` WHERE `id` = ", DB_EXPENSES_TABLE).(int)$_GET['delete'] ) or debug($q) and log_err(mysql_error()) ) ;
+
+
 // ************* Register new expense *************
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -43,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     	'message' => "Amount is missing"
     ]);
   } else {
-		$sql = "INSERT INTO expense (amt, note, budget_id, `date`) VALUES (?,?,?,DATE(?))";
+		$sql = sprintf("INSERT INTO `%s` (amt, note, budget_id, `date`) VALUES (?,?,?,DATE(?))", DB_EXPENSES_TABLE);
 		$stmt= $conn->prepare($sql);
 		$stmt->bind_param("dsis", $_POST['amt'], $_POST['note'], $budget_id, $seldate);
 		$stmt->execute() or log_err([
@@ -58,17 +69,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
 
-$q = "
+$q = sprintf("
  SELECT 
  	DATEDIFF(NOW(), budget.start_date) + 1 as days, 
 	budget.daily as daily_budget,
 	SUM(expense.amt) as expenses,
-	(SELECT SUM(amt) as sum FROM expense WHERE (DATE(date) = $seldate)) as todays_expenses
+	(SELECT SUM(amt) as sum FROM %s WHERE (DATE(date) = $seldate)) as todays_expenses
 from budget JOIN expense on expense.budget_id = budget.id 
 WHERE budget.id = $budget_id;
-";
+", DB_EXPENSES_TABLE);
 
-$q_daily = 	"SELECT amt, note  FROM expense WHERE DATE(expense.date) = '$seldate' AND budget_id = $budget_id";
+$q_daily = 	sprintf("SELECT amt, note  FROM %s WHERE DATE(`date`) = '$seldate' AND budget_id = $budget_id", DB_EXPENSES_TABLE);
 
 debug($q_daily);
 
