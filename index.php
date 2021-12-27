@@ -25,9 +25,11 @@ function debug($info) {
 
 $conn = mysqli_connect(SERVERNAME, USERNAME, PASSWORD, DBNAME);
 
-$budget_id = 1;
+$budget_id = 1; // eek
 
 // ************* Selected date **************
+
+// selected date is today by default. 
 
 $curdate = mysqli_fetch_assoc(mysqli_query(
 	$conn, 
@@ -42,12 +44,13 @@ $cururl = $_SERVER['PHP_SELF']."?date=$seldate";
 
 
 @$_GET['delete'] 
-and !mysqli_query($conn, $q = sprintf(
-	"DELETE FROM `%s` WHERE `id` = %d",
-	 DB_EXPENSES_TABLE, $_GET['delete'] 
-)) 
-and debug($q) 
-and log_err(mysqli_error($conn)) 
+and ( 
+	mysqli_query($conn, $q = sprintf(
+		"DELETE FROM `%s` WHERE `id` = %d",
+		 DB_EXPENSES_TABLE, $_GET['delete'] 
+	)) 
+	or log_err(mysqli_error($conn)) 
+)
 ;
 
 
